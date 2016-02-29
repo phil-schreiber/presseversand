@@ -28,7 +28,7 @@
 
 }
 body{
-	background:#e5e5e5;
+	background:#fff;
 	font-size: 90%;
     
     line-height: 150%;
@@ -59,7 +59,7 @@ input:hover,input:focus,
 select:hover,select:focus,
 textarea:hover,textarea:focus {
 background: #fff;
-	border: 1px solid #01994e;
+	border: 1px solid #e27d26;
 	outline: none;
 }
 
@@ -154,7 +154,7 @@ textarea {
 
 a {
     text-decoration:none;
-    color:#01994e;
+    color:#e27d26;
     border-radius:0.2em;
     -webkit-transition: color 0.15s ease-in;
     -moz-transition: color 0.15s ease-in;
@@ -163,7 +163,7 @@ a {
 }
 
 a:hover {
-    color:#7AB02C;
+    color:#e27d26;
 }
 
 a:active {
@@ -909,7 +909,7 @@ a:active {
   font-style: normal !important;
   font-weight: normal !important;
   line-height: 1 !important;
-	color:#01994e !important;	
+	color:#e27d26 !important;	
 	
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
@@ -1057,12 +1057,12 @@ span.deleteListItem{
 	right:2px;	
 }
 .ceElement h1{
-	background:#009149;
+	background:#e27d26;
 	margin:0px;
 	color:#fff;
 	text-align: center;
 	padding:15px 10px;	
-	box-shadow:0px 2px 5px 0px rgba(78,78,78,1);
+	/*box-shadow:0px 2px 5px 0px rgba(78,78,78,1);*/
 	margin-bottom:10px;
 }
 
@@ -1073,7 +1073,7 @@ span.deleteListItem{
 	position:relative;
 	background: #e5e5e5;
 	padding: 10px;
-	border-radius: 0.5em;
+	/*border-radius: 0.5em;*/
 	box-shadow: 0px 0px 5px 0px rgba(78,78,78,1);
 }
 .small .listelementContainer{
@@ -1166,7 +1166,7 @@ span.deleteListItem{
 	padding:20px;
 	z-index: 1013;
 	background:#e5e5e5;
-	border:#01994e 1px solid;
+	border:#e27d26 1px solid;
 	box-shadow: 0px 0px 10px #000;
 	display:none;
 	color:#fff;	
@@ -1234,7 +1234,7 @@ table.maintable tr.odd td{
 	padding-left:2px;
 	padding-top:1px;
 	font-weight:bold;
-	border:#01994e 1px solid;
+	border:#e27d26 1px solid;
 	border-radius:10px;
 	cursor:pointer;
 	line-height:1em;
@@ -1344,7 +1344,7 @@ table.maintable tr.odd td{
 	display:inline-block;
 	
 	position: relative;
-	background:#01994e;
+	background:#e27d26;
 	height:50px;
 }
 .modes{	
@@ -1381,7 +1381,7 @@ table.maintable tr.odd td{
 }
 .window.jsplumbified div.delete:hover{
 	cursor:pointer;
-	color:#01994e;
+	color:#e27d26;
 }
 .sendoutobject .info:hover{
 	cursor:pointer;
@@ -1457,7 +1457,7 @@ table#mapTable{
 	float:right;
 	background:#e3e3e3;
 	box-shadow: 0px 0px 10px 2px rgba(78,78,78,1);
-	color:#01994e;
+	color:#e27d26;
 	padding:10px;
 		
 }
@@ -1476,7 +1476,7 @@ table#mapTable{
 	
 }
 #reviewControls label{
-	color: #01994e;
+	color: #e27d26;
 	font-size:1.5em;
 	display: inline-box;
 	width:100px;
@@ -1485,7 +1485,7 @@ table#mapTable{
 	
   padding: 10px;
   margin-left:10px;
-  color:#01994e;
+  color:#e27d26;
 }
 .filterSet{
 	padding:5px;
@@ -1508,7 +1508,7 @@ table#mapTable{
 	}
 	#headerLeft{
 		/*height:130px;*/
-		/*background:#009149;*/
+		/*background:#e27d26;*/
 		float:left;
 		/*box-shadow: 2px -2px 3px 0px rgba(78,78,78,0.5);*/
 	}
@@ -1525,8 +1525,8 @@ table#mapTable{
 		
 		width:100%;
 		height:100%;
-		/*border-bottom:40px solid #009149;*/
-		box-shadow: inset 2px -2px 2px 0px rgba(78,78,78,0.5);
+		/*border-bottom:40px solid #e27d26;
+		box-shadow: inset 2px -2px 2px 0px rgba(78,78,78,0.5);*/
 		
 	}
 	.navbar-nav{
@@ -1547,7 +1547,7 @@ table#mapTable{
 		width:120px;
 		margin-left:auto;
 		margin-right:auto;
-		background:#009149;
+		background:#e27d26;
 
 		z-index: 99;
 		display: none;  
