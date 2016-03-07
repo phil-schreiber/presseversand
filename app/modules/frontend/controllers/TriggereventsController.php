@@ -15,8 +15,8 @@ use nltool\Models\Sendoutobjects,
 class TriggereventsController extends ControllerBase
 {
 	private $events=array(
-		/*1 => 'date',
-		2 => 'recursive',*/
+		1 => 'date',
+		/*2 => 'recursive',*/
 		3 => 'birthday',
 		4 => 'subscribe',
 		5 => 'unsubscribe'
@@ -42,7 +42,7 @@ class TriggereventsController extends ControllerBase
 		if($this->request->isPost()){
 			$time = time();
 			
-			$dateArr=explode(' ',$this->request->hasPost('sendoutdate') ? $this->request->getPost('sendoutdate') : '');
+			$dateArr=explode(' ',$this->request->hasPost('sendoutdate') ? $this->request->getPost('sendoutdate') : array());
 			$senddate=0;
 			if(count($dateArr)>1){
 				$dateTimeArr=explode(':',$dateArr[1]);
@@ -59,8 +59,8 @@ class TriggereventsController extends ControllerBase
 				'hidden' => 0,
 				'eventtype' => $this->request->hasPost('eventtype') ? $this->request->getPost('eventtype') : 0,
 				'title' => $this->request->hasPost('title') ? $this->request->getPost('title') : 0,
-				'repetitive' => $this->request->hasPost('eventtype') == 2 ? 1 : 0,				
-				'repeatcycle' => $this->request->hasPost('repeatcycle') ? $this->request->getPost('repeatcycle') : '',
+				'repetitive' => $this->request->getPost('eventtype') == 2 ? 1 : 0,				
+				'repeatcycle' => $this->request->hasPost('repeatcycle') ? $this->request->getPost('repeatcycle') : 0,
 				'dayofweek' => $this->request->hasPost('dayofweek') ? $this->request->getPost('dayofweek') : 0,
 				'repeatcycletime' => $this->request->hasPost('repeatcycletime') ? $this->request->getPost('repeatcycletime') : 0,
 				'sendoutdate' => $senddate,
@@ -74,7 +74,8 @@ class TriggereventsController extends ControllerBase
 				'distributoruid' => $this->request->hasPost('addresslistobject') ? $this->request->getPost('addresslistobject') : 0,
 				'cruser_id' => $this->session->get('auth')['usergroup'],
 				'addressfolder' => $this->request->hasPost('addressfolder') ? $this->request->getPost('addressfolder') : 0,
-				'birthday' => $this->request->hasPost('birthday') ? $this->request->getPost('birthday') : ''
+				'birthday' => $this->request->hasPost('birthday') ? $this->request->getPost('birthday') : '',
+                                'sent' => 0
 			));
 			
 			if(!$triggerevent->save()){
@@ -182,7 +183,8 @@ class TriggereventsController extends ControllerBase
 				'distributoruid' => $this->request->hasPost('addresslistobject') ? $this->request->getPost('addresslistobject') : 0,
 				'cruser_id' => $this->session->get('auth')['usergroup'],
 				'addressfolder' => $this->request->hasPost('addressfolder') ? $this->request->getPost('addressfolder') : 0,
-				'birthday' => $this->request->hasPost('birthday') ? $this->request->getPost('birthday') : ''
+				'birthday' => $this->request->hasPost('birthday') ? $this->request->getPost('birthday') : '',
+                                'sent' => 0
 			));
 			if(!$triggerevent->update()){
 				$this->flash->error($triggerevent->getMessages());
@@ -238,6 +240,38 @@ class TriggereventsController extends ControllerBase
 		
 	}
 	
+        public function dateEventHandler(){
+            $args =  func_get_args();
+            $event = $args[1];
+            $event->sent=1;
+            $event->update();
+            $sendoutobject = new Sendoutobjects();
+            $sendoutobject->assign(array(
+                'pid'=>0,
+                'crdate' => time(),
+                'tstamp' => $event->sendoutdate,
+                'sendstart' =>0,
+                'sendend' =>0,
+                'cruser_id' =>$event->cruser_id,
+                'usergroup' =>$event->usergroup,
+                'deleted' =>0,
+                'hidden' => 0,
+                'reviewed'=>1,
+                'cleared'=>1,
+                'inprogress'=>0,
+                'sent'=>0,
+                'campaignuid'=>0,						
+                'mailobjectuid'=>$event->mailobjectuid,
+                'configurationuid'=>$event->configurationuid,
+                'subject'=>$event->subject,
+                'abtest'=>0,
+                'distributoruid'=>$event->distributoruid,
+                'domid'=> '',							
+                'eventuid' => $event->uid
+            ));
+            $sendoutobject->save();
+        }
+        
 	public function recursiveEventHandler(){
 		$args=  func_get_arg();
 		var_dump($args);
@@ -292,33 +326,35 @@ class TriggereventsController extends ControllerBase
 			'domid' => '',
 			'eventuid' => $event->uid
 		));
-		$sendoutobject->save();
+                if($sendoutobject->save()){
+                    $queueObject=new \nltool\Models\Mailqueue();
+                    $queueObject->assign(array(
+                            'pid' => $event->uid,
+                            'time' => 0,
+                            'deleted' => 0,
+                            'hidden' => 0,
+                            'sent' => 0,
+                            'mailbody' => Null,
+                            'crdate' => $time,
+                            'distributoruid' => 0,
+                            'addressuid' => $address->uid,
+                            'campaignuid' => 0,
+                            'sendoutobjectuid' => $sendoutobject->uid,
+                            'mailobjectuid' => $event->mailobjectuid,
+                            'configurationuid' => $event->configurationuid,
+                            'email' => $address->email,
+                            'subject' => $event->subject,
+                            'sendermail' => $configuration->sendermail,
+                            'sendername' => $configuration->sendername,
+                            'answermail' => $configuration->answermail,
+                            'answername' => $configuration->answername, 
+                            'returnpath' => $configuration->returnpath,
+                            'organisation' => $configuration->organisation
+                    ));
+                    $queueObject->save();
+                }
 		
-		$queueObject=new \nltool\Models\Mailqueue();
-		$queueObject->assign(array(
-			'pid' => $event->uid,
-			'time' => 0,
-			'deleted' => 0,
-			'hidden' => 0,
-			'sent' => 0,
-			'mailbody' => Null,
-			'crdate' => $time,
-			'distributoruid' => 0,
-			'addressuid' => $address->uid,
-			'campaignuid' => 0,
-			'sendoutobjectuid' => $sendoutobject->uid,
-			'mailobjectuid' => $event->mailobjectuid,
-			'configurationuid' => $event->configurationuid,
-			'email' => $address->email,
-			'subject' => $event->subject,
-			'sendermail' => $configuration->sendermail,
-			'sendername' => $configuration->sendername,
-			'answermail' => $configuration->answermail,
-			'answername' => $configuration->answername, 
-			'returnpath' => $configuration->returnpath,
-			'organisation' => $configuration->organisation
-		));
-		$queueObject->save();
+		
 		
 	}
 	

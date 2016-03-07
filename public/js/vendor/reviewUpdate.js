@@ -37,6 +37,7 @@ function pluginInit(){
 		if(jQuery('#triggerevent').length){
 			triggerevent='&triggerevent='+jQuery('#triggerevent').val();
 		}
+                
 		ajaxIt('review','update','sendoutobjectuid='+sendoutobjectuid+'&reviewed='+jQuery(this).context.checked+triggerevent,oksent);	
 	});
 	
@@ -66,18 +67,28 @@ function pluginInit(){
 	});
 	
 	jQuery('#overideReviews').click(function(e){
-		ajaxIt('review','update','sendoutobjectuid='+sendoutobjectuid+'&reviewOverride='+jQuery(this).context.checked,oksent);	
+            var triggerevent='';
+		
+            if(jQuery('#triggerevent').length){
+                    triggerevent='&triggerevent='+jQuery('#triggerevent').val();
+            }
+            ajaxIt('review','update','sendoutobjectuid='+sendoutobjectuid+'&reviewOverride='+jQuery(this).context.checked+triggerevent,oksent);	
 	});
 	
 	jQuery('#overrideCleared').click(function(e){
+            var triggerevent='';
+		
+            if(jQuery('#triggerevent').length){
+                    triggerevent='&triggerevent='+jQuery('#triggerevent').val();
+            }
 		if(jQuery('#overideReviews').prop('checked')===true){		
 			if(jQuery(this).context.checked==true){
 				var cnfrm = confirm(jQuery('#sureclear').val());
 				if (cnfrm == true) {
-					ajaxIt('review','update','sendoutobjectuid='+sendoutobjectuid+'&clearanceOverride='+jQuery(this).context.checked,oksent);	
+					ajaxIt('review','update','sendoutobjectuid='+sendoutobjectuid+'&clearanceOverride='+jQuery(this).context.checked+triggerevent,oksent);	
 				}
 			}else{
-				ajaxIt('review','update','sendoutobjectuid='+sendoutobjectuid+'&clearanceOverride='+jQuery(this).context.checked,oksent);
+				ajaxIt('review','update','sendoutobjectuid='+sendoutobjectuid+'&clearanceOverride='+jQuery(this).context.checked+triggerevent,oksent);
 			}
 		}else{
 			alert(jQuery('#reviewFirst').val());

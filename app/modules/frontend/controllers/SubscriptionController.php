@@ -16,7 +16,7 @@ class SubscriptionController extends ControllerBase implements EventsAwareInterf
 {
 	protected $_eventsManager;
 
-    public function setEventsManager(Phalcon\Events\ManagerInterface $eventsManager)
+    public function setEventsManager(\Phalcon\Events\ManagerInterface $eventsManager)
     {
         $this->_eventsManager = $eventsManager;
     }

@@ -29,6 +29,7 @@ class ReportController extends ControllerBase
 				"bind" => array(1 => $this->session->get('auth')['usergroup']),
 				"order" => "tstamp DESC"
 			));
+                        
 			$reportableCampaigns=array();
 			foreach($campaigns as $campaign){
 				if($campaign->hasReportableSendoutobjects()){
@@ -36,7 +37,11 @@ class ReportController extends ControllerBase
 				}
 			}
 			
+                        $sendoutobjects=  Sendoutobjects::find(array(
+				'conditions' => 'deleted=0 AND hidden=0 AND campaignuid=0 AND (inprogress=1 OR sent = 1) AND eventuid > 0'				
+			));
 			
+                        $this->view->setVar('eventobjects',$sendoutobjects);
 			$this->view->setVar('campaignobjects',$reportableCampaigns);
 			$this->view->setVar('list',true);
 		}else{

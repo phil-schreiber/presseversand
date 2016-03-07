@@ -20,5 +20,14 @@
 	</ul>
 	{% endif %}
 	</div>
+        <div class="ceElement medium">
+	<h1>{{tr('triggerevents')}} {{tr('reports')}}</h1>
+        <ul class="listviewList">
+		{% for eventobject in eventobjects %}
+		<li><a href='{{ baseurl }}{{language}}/report/create/{{ eventobject.uid }}'>>> {{eventobject.subject}} | {{ date('d.m.Y',eventobject.tstamp) }}</a></li>
+		{% endfor %}
+	</ul>
+        </div>
 	{% endif %}
+        
 </div>

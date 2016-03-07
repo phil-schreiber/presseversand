@@ -13,12 +13,12 @@ class PolleventsController extends Triggerauth implements EventsAwareInterface
 {
 	protected $_eventsManager;
 	private $eventFuncs=array(
-		/*1 => 'dateEvents',
-		2 => 'recursiveEvents',*/
+		1 => 'dateEvents',
+		/*2 => 'recursiveEvents',*/
 		3 => 'birthdayEvents'
 	);
 	
-    public function setEventsManager(Phalcon\Events\ManagerInterface $eventsManager)
+    public function setEventsManager(\Phalcon\Events\ManagerInterface $eventsManager)
     {
         $this->_eventsManager = $eventsManager;
     }
@@ -36,10 +36,19 @@ class PolleventsController extends Triggerauth implements EventsAwareInterface
 	}
 	
 	private function dateEvents(){
-		
+            
+            $events=\nltool\Models\Triggerevents::find(array(
+               'conditions' => 'deleted = 0 AND hidden = 0 AND cleared = 1 AND reviewed = 1 AND eventtype = 1 AND inprogress=0 AND sent=0 AND sendoutdate <= ?1',
+               'bind' => array(
+                   1 => time()
+               )
+            ));
+            foreach($events as $event){
+                
+                $this->triggerevents->fire("PolleventsController:dateEventHandler", $event);
+            }
 	}
-	
-	
+	        
 	private function recursiveEvents(){
 		$daysofweek=array(
 			0 => 7,
