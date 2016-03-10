@@ -212,10 +212,11 @@ class TemplateobjectsController extends ControllerBase
 		foreach ($this->request->getUploadedFiles() as $file){
 						$nameArray=explode('.',$file->getName());
 						$filetype=$nameArray[(count($nameArray)-1)];
-						$tmpFile='../app/cache/tmp/'.$time.'_'.$file->getName();
+						$tmpFile='../public/images/templateThumbnails/template_'.$uid.'_S.'.$filetype;
+                                                $saveFilename='public/images/templateThumbnails/template_'.$uid.'_S.'.$filetype;
 						$file->moveTo($tmpFile);
 						
-						$thumbFilenameS='../public/images/templateThumbnails/template_'.$uid.'_S.'.$filetype;
+						/*$thumbFilenameS='../public/images/templateThumbnails/template_'.$uid.'_S.'.$filetype;
 						$thumbFilenameL='../public/images/templateThumbnails/template_'.$uid.'_L.'.$filetype;
 						$saveFilename='public/images/templateThumbnails/template_'.$uid.'_S.'.$filetype;
 						
@@ -224,9 +225,9 @@ class TemplateobjectsController extends ControllerBase
 						$imageS->save($thumbFilenameS);
 						$imageL = new GDAdapter($tmpFile);
 						$imageL->resize(600,1000);
-						$imageL->save($thumbFilenameL);
+						$imageL->save($thumbFilenameL);*/
                       
-						 unlink($tmpFile);
+						 //unlink($tmpFile);
               }
 			     
 		return $saveFilename;
