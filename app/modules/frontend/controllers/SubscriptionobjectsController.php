@@ -58,6 +58,7 @@ class SubscriptionobjectsController extends ControllerBase
 			$time=time();
 			$subscriptionobject=new Subscriptionobjects();
 			$subscriptionobject->assign(array(
+                                'pid' => 0,
 				'tstamp' => $time,
 				'crdate' => $time,
 				'deleted' => 0,
