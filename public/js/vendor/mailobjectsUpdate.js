@@ -92,7 +92,7 @@ var pollForTinymce=function(){
 				"insertdatetime media table contextmenu paste jbimages fileupload"
 			],
                         
-			extended_valid_elements : "dynamic",
+			extended_valid_elements : "dynamic,p[style],td[style]",
 			custom_elements: "~dynamic",			
 			toolbar: "customem | insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link | forecolor backcolor |code",
                          textcolor_map: [
@@ -421,7 +421,7 @@ function pluginInit(){
 		
 			var editElements='';
 			jQuery('#editFrame .editable a, #editFrame .editable div, #editFrame .editable td, #editFrame .editable table, #editFrame .editable img, #editFrame .editable p').removeAttr('data-mce-style  data-mce-href  data-mce-src data-mce-selected');
-			jQuery('#editFrame .editable p').removeAttr('style');
+			//jQuery('#editFrame .editable p').removeAttr('style');
 			jQuery('#editFrame .editable').each(function(posIndex,posEl){
 				jQuery(posEl).children('.cElement').each(function(index,element){
 					var content=jQuery(element)[0].outerHTML;
