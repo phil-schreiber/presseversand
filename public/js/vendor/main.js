@@ -64,8 +64,28 @@ var requireControllerPlugins=function(){
 	}else if(requirePlugins[0]=='datatables'){
 		
 		require([requirePlugins[0]],function(datatables){				
-				
-				require([requirePlugins[1]],letsRoll);
+                    
+				if(requirePlugins[1]=='tableTools'){                                                                        
+                                    require([requirePlugins[1]],function(){                                        
+                                            require([requirePlugins[2]],function(){
+                                                require([requirePlugins[2]],function(){
+                                                    require([requirePlugins[3]],function(){
+                                                        require([requirePlugins[4]],letsRoll);
+                                                    });
+                                                });
+                                            });
+                                        
+                                        
+                                    });
+                                }else{
+                                    for(var i=1; i<requirePlugins.length; i++){
+                                    if(i==requirePlugins.length-1){
+                                            require([requirePlugins[i]],letsRoll);
+                                    }else{
+                                            require([requirePlugins[i]]);
+                                    }
+                                }
+			}
 			});
 	}else if(requirePlugins[0]=='datetimepicker'){
 		require([requirePlugins[0]],function(datetimepicker){				
