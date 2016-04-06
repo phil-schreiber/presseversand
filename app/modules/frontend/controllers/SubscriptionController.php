@@ -84,7 +84,7 @@ class SubscriptionController extends ControllerBase implements EventsAwareInterf
 			$time=time();
 			$salutation='';
 			if($this->request->hasPost('salutation')){
-				$salution=$this->request->getPost('salutation')==0 ? $this->translate('salutation.female') : $this->translate('salutation.male');
+				$salutation=$this->request->getPost('salutation')==0 ? $this->translate('salutation.female') : $this->translate('salutation.male');
 			}
 			
 			$address = new Addresses();			
@@ -92,13 +92,13 @@ class SubscriptionController extends ControllerBase implements EventsAwareInterf
 				'pid' => $this->request->hasPost('addressfolder') ? $this->request->getPost('addressfolder') : 0,
 				'crdate' => $time,
 				'tstamp' => $time,
-				'cruser_id' =>$this->session->get('auth')['uid'],
+				'cruser_id' =>0,
 				'deleted' => 0,
 				'hidden' => 0,
-				'usergroup' =>$this->session->get('auth')['usergroup'],
+				'usergroup' =>0,
 				'first_name' => $this->request->hasPost('firstname') ? $this->request->getPost('firstname') : '',
 				'last_name' => $this->request->hasPost('lastname') ? $this->request->getPost('lastname') : '',
-				'salutation' => $salution,
+				'salutation' => $salutation,
 				'title' => $this->request->hasPost('title') ? $this->request->getPost('title') : '',
 				'email' => $this->request->hasPost('email') ? $this->request->getPost('email') : '',
 				'phone' => $this->request->hasPost('phone') ? $this->request->getPost('phone') : '',
@@ -113,6 +113,8 @@ class SubscriptionController extends ControllerBase implements EventsAwareInterf
 				'formal' => 1,
 				'hashtags' => '',
 				'itemsource' => 'tool',
+				'hasprofile' => 0,
+                            'birthday' => $this->request->hasPost('birthday') ? $this->request->getPost('birthday') : 0,
 				'hasprofile' => 0
 			));
 			if (!$address->save()) {
