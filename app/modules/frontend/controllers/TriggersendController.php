@@ -7,6 +7,7 @@ use nltool\Models\Sendoutobjects,
 	nltool\Models\Mailqueue,
 	nltool\Models\Linklookup;
 require_once '../app/library/Swiftmailer/swift_required.php';
+require_once '../app/library/Html2Plain/class.html2text.inc';
 /**
  * Class TriggersendController
  *
@@ -338,7 +339,9 @@ class TriggersendController extends Triggerauth
 				
 				 				 
 				$message->setBody($bodyFinal, 'text/html');
-                                $message->addPart($this->config['defaults']['plaintextFallbackText'], 'text/plain');
+                                 $h2t = new \html2text($bodyFinal);
+                                $message->addPart($h2t->get_text(), 'text/plain');
+                                //$message->addPart($this->config['defaults']['plaintextFallbackText'], 'text/plain');
 				$to=array($mailqueueElement->m->email => $mailqueueElement->a->first_name.' '.$mailqueueElement->a->last_name);
 				$message->setTo($to);
 				

@@ -9,15 +9,7 @@
 }
 
 /** OPEN SANS FONT **/
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 400;
- 	src:local('Open Sans'), 
- 		local('OpenSans'),
- 		url("OpenSans-Regular.ttf") format('truetype'),
- 		url("OpenSans.woff") format('woff');
-}
+
 
 /** FB **/
 #like {
@@ -38,7 +30,7 @@
 body {
     padding:0;
     margin:0;    
-    font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;    
+    font-family: Arial, sans-serif;    
     background-color: whitesmoke;
 }
 
@@ -295,7 +287,7 @@ path, ._jsPlumb_endpoint { cursor:pointer; }
 }
 
 .window a {
-    font-family:helvetica;
+    font-family:Arial,sans-serif;
 }
 
 .demo-links, .library-links {

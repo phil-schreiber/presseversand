@@ -4,6 +4,7 @@ use nltool\Models\Addresses,
 	nltool\Models\Campaignobjects,
 	nltool\Models\Sendoutobjects;	
 require_once '../app/library/Swiftmailer/swift_required.php';
+require_once '../app/library/Html2Plain/class.html2text.inc';
 /**
  * Class TestmailController
  *
@@ -59,7 +60,8 @@ class TestmailController extends ControllerBase
 						->setReturnPath($configuration->returnpath);
 			$message->setBody($bodyFinal, 'text/html');
 			$message->setTo(array($address->email => 'Test Test'));
-			
+			 $h2t = new \html2text($bodyFinal);
+                                $message->addPart($h2t->get_text(), 'text/plain');
 
 			//pull the trigger
 			$mailer->send($message, $failures);	
