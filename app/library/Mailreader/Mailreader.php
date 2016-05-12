@@ -37,28 +37,29 @@ class Mailreader {
             $multiArray = $bouncehandler->get_the_facts($bounce);
               if (!empty($multiArray[0]['action']) && !empty($multiArray[0]['status']) && !empty($multiArray[0]['recipient']) ) {
                 if ($multiArray[0]['action']=='failed') {
-                $email_addresses[$multiArray[0]['recipient']]++; //increment number of failures
-                $delete_addresses[$multiArray[0]['recipient']][] = $n; //add message to delete array
+                $email_addresses[$multiArray[0]['recipient']]=$multiArray[0]['response']; //increment number of failures
+                //$delete_addresses[$multiArray[0]['recipient']][] = $n; //add message to delete array
                 } //if delivery failed
               } //if passed parsing as bounce
             } //for loop
 
             # process the failures
-              foreach ($email_addresses as $key => $value) { //trim($key) is email address, $value is number of failures
-                if ($value>=$delete) {
+              //foreach ($email_addresses as $key => $value) { //trim($key) is email address, $value is number of failures
+                //if ($value>=$delete) {
                 /*
                 do whatever you need to do here, e.g. unsubscribe email address
                 */
                 # mark for deletion
-                  foreach ($delete_addresses[$key] as $delnum) imap_delete($conn, $delnum);
-                } //if failed more than $delete times
-              } //foreach
+                 // foreach ($delete_addresses[$key] as $delnum) imap_delete($conn, $delnum);
+                //} //if failed more than $delete times
+              //} //foreach
 
             # delete messages
-            imap_expunge($conn);
+            //imap_expunge($conn);
 
             # close
-            imap_close($conn);
+            imap_close($this->conn);
+            return $email_addresses;
         }
         
 	// close the server connection

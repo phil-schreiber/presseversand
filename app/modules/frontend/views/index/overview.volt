@@ -115,6 +115,12 @@
 		{% endif %}
 		
 		{% if session.get('auth')['superuser'] == 1 %}		
+                <div class="ceElement xs">
+			
+			<h1>{{ link_to(language~'/bounce/index/', 'Bounces', 'title': 'Bounces') }}
+			</h1>			
+			
+		</div>
 		<div class="ceElement xs">
 			
 			<h1>{{ link_to('backend', tr('backend'), 'title': tr('backend')) }}
