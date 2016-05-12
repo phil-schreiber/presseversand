@@ -36,8 +36,8 @@ class Mailreader {
             $bounce = imap_fetchheader($this->conn, $n).imap_body($this->conn, $n); //entire message
             $multiArray = $bouncehandler->get_the_facts($bounce);
               if (!empty($multiArray[0]['action']) && !empty($multiArray[0]['status']) && !empty($multiArray[0]['recipient']) ) {
-                if ($multiArray[0]['action']=='failed') {
-                $email_addresses[$multiArray[0]['recipient']]=$multiArray[0]['response']; //increment number of failures
+                if ($multiArray[0]['action']!=='success') {
+                $email_addresses[$multiArray[0]['recipient']]=$multiArray[0]; //increment number of failures
                 //$delete_addresses[$multiArray[0]['recipient']][] = $n; //add message to delete array
                 } //if delivery failed
               } //if passed parsing as bounce

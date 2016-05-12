@@ -25,7 +25,7 @@ class BounceController extends ControllerBase{
                     $this->request->getPost('port')
             );
             $bounceArray=$mailreader->processMails();
-            $csv='Email;Status'.PHP_EOL;
+            $csv='Email;Status;Action;Response'.PHP_EOL;
             foreach($bounceArray as $email => $status){
                 $entries=Addresses::findByEmail($email);
                 
@@ -33,7 +33,7 @@ class BounceController extends ControllerBase{
                 $entry->deleted=1;
                 $entry->update();
                 }
-                $csv.=$email.';'.$status.PHP_EOL;
+                $csv.=$email.';'.$status['status'].';'.$status['action'].';'.$status['response'].PHP_EOL;
             }
             $time=time();
             $filename='bounces-'.$time.'.csv';
