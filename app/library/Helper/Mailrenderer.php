@@ -88,7 +88,7 @@ class Mailrenderer extends Component{
 	}
 	
 	public function addOpenmailerBlankImage($matches){
-		return $matches[0].'<img width="1" height="1" src="'.'http://'.$this->request->getHttpHost().$this->baseUri.'linkreferer/open/'.$this->mailinguid.'/'.$this->currentaddressuid.'">';
+		return $matches[0].'<img width="1" height="1" src="'.'http://'.$this->request->getHttpHost().$this->baseUri.'linkreferer/open/'.$this->mailinguid.'/'.$this->currentaddressuid.'" alt="">';
 	}
 	
 	public function renderVars($body,$address){
