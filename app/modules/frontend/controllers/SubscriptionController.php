@@ -16,7 +16,7 @@ class SubscriptionController extends ControllerBase implements EventsAwareInterf
 {
 	protected $_eventsManager;
 
-    public function setEventsManager(\Phalcon\Events\ManagerInterface $eventsManager)
+    public function setEventsManager( $eventsManager)
     {
         $this->_eventsManager = $eventsManager;
     }
@@ -43,7 +43,7 @@ class SubscriptionController extends ControllerBase implements EventsAwareInterf
 		$mailaddress=$this->request->getQuery('email','email');
 		$userUid=$this->request->getQuery('id','int');
 		if($mailaddress && $userUid){
-			
+		/* Email + uid, so that no INT spamming can accidentially wipe the DB*/	
 		$address=  Addresses::findFirst(array(
 				'conditions'=>'email LIKE ?1 AND uid = ?2',
 				'bind'=>array(
@@ -56,18 +56,30 @@ class SubscriptionController extends ControllerBase implements EventsAwareInterf
 		}
 		
 		$this->view->setVar('unsubscribe',false);
-		if($address){
-                        $address->tstamp=time();
-			 $address->deleted=1;
-			 $address->hidden =1;
+		if($address){                    
+                    $allAddresses=  Addresses::find(array(
+                        'conditions'   => 'email LIKE ?1 AND pid = ?2',
+                        'bind' => array(
+                            1 => $address->email,
+                            2 => $address->pid
+                        )
+                        
+                    ));
+                    foreach($allAddresses as $allAddress){
+                        $allAddress->tstamp=time();
+			 $allAddress->deleted=1;
+			 $allAddress->hidden =1;
 					
-			 if (!$address->save()) {
-			 $this->flash->error($address->getMessages());
+			 if (!$allAddress->save()) {
+			 $this->flash->error($allAddress->getMessages());
 			 
 			 }else{
 				$this->view->setVar('unsubscribe',true);				
-				$this->triggerevents->fire("SubscriptionController:subscriptionEventHandler", $address);
+				
 			 }
+                    }
+                    $this->triggerevents->fire("SubscriptionController:subscriptionEventHandler", $address);
+                        
 		}
 		
 		
