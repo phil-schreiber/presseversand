@@ -17,6 +17,20 @@ class AddressfoldersController extends ControllerBase
 			1 => '"',
 			2 => "'"
 		);
+        private $addressesDBFielMap=array(
+                    1=>'first_name',
+                    2=>'last_name',
+                    3=>'title',
+                    4=>'salutation',
+                    5=>'email',
+                    6=>'company',
+                    7=>'phone',
+                    8=>'address',
+                    9=>'city',
+                    10=>'zip',
+                    11=>'userlanguage',
+                    12=>'gender'
+            );
 	public function indexAction(){
 		$environment= $this->config['application']['debug'] ? 'development' : 'production';
 			$baseUri=$this->config['application'][$environment]['staticBaseUri'];
@@ -44,7 +58,7 @@ class AddressfoldersController extends ControllerBase
 		}else{
 			if($this->dispatcher->getParam('uid') && !$this->request->getQuery('downloadunsubscribes')){
                             
-				$this->assets->addCss('css/jquery.dataTables.css');
+				
 				$this->assets->addJs('js/vendor/addressfoldersInit.js');
 				$addressfolder=Addressfolders::findFirst(array(
 					'conditions'=>"deleted=0 AND hidden=0 AND usergroup=?1 AND uid = ?2",
@@ -175,6 +189,7 @@ class AddressfoldersController extends ControllerBase
 						if (!$addressfolder->save()) {
 							$this->flash->error($addressfolder->getMessages());
 						}
+                                                $this->bulkInsertAddresses($addressfolder);
 					}else{
 						$addressfolder=  Addressfolders::findFirst(array(
 							'conditions'=>'uid=?1',
@@ -182,87 +197,23 @@ class AddressfoldersController extends ControllerBase
 								1=>$this->request->getPost('addressFoldersUid')
 							)
 						));
-                                                if($this->request->hasPost('deleteallexisting')){
-                                                    $this->eraseFoldAdd($addressfolder->uid);
-                                                }
+                                                
 						$addressfolder->assign(array(
 								'tstamp'=>$time
 								));
 						$addressfolder->update();
+                                                if($this->request->hasPost('deleteallexisting')){
+                                                    $this->eraseFoldAdd($addressfolder->uid);
+                                                    $this->bulkInsertAddresses($addressfolder);
+                                                }else{
+                                                    $this->updateAddresses($addressfolder);
+                                                }
+                                                
 					}
 						
 						
 
-						$row=0;
-						$insStr='';
-						$addressesDBFielMap=array(
-							1=>'first_name',
-							2=>'last_name',
-							3=>'title',
-							4=>'salutation',
-							5=>'email',
-							6=>'company',
-							7=>'phone',
-							8=>'address',
-							9=>'city',
-							10=>'zip',
-							11=>'userlanguage',
-							12=>'gender'
-						);
-						//Using Address Segment n:1 relation; lookup is there, but no mass insert possible 
-						$insField='(pid,tstamp,crdate,cruser_id,usergroup';
-						$indexArray=array();
-						foreach($this->request->getPost('adressFieldsMap') as $addressFieldIndex=> $addressField){
-							if(intval($addressField) !=0 && !is_nan(intval($addressField))){
-								$insField.=','.$addressesDBFielMap[intval($addressField)];
-								array_push($indexArray,$addressFieldIndex);
-							}
-						}
-						$insField.=')';
-						$basicInsVals=$addressfolder->uid.','.$time.','.$time.','.$this->session->get('auth')['uid'].','.$this->session->get('auth')['usergroup'];
-						$tmpFile='../app/cache/tmp/'.$this->request->getPost('time').'_'.$this->request->getPost('filename');
-						if (($handle = fopen($tmpFile, "r")) !== FALSE) {
-							/*pretty nasty code redundancy*/
-							if($this->request->getPost('firstRowFieldNames')==1){
-								$data=$this->getCsvWrapper($handle, 1000, $this->_divider[$this->request->getPost('divider')],$this->_dataWrap[$this->request->getPost('dataFieldWrap')]);
-								
-							}
-							
-							while(($data = $this->getCsvWrapper($handle, 1000, $this->_divider[$this->request->getPost('divider')],$this->_dataWrap[$this->request->getPost('dataFieldWrap')])) !== FALSE){
-									$insStr.='('.$basicInsVals;
-									foreach($data as $valueindex=> $value){
-										if(in_array($valueindex, $indexArray)){
-											if(is_numeric($value)){
-												$insStr.=','.$value;
-											}else{
-												$insStr.=',"'.$value.'"';
-											}
-
-										}
-									}
-
-									$insStr.='),';									
-									if($row>0 && $row%500==0){
-										$insStr=substr($insStr,0,-1);
-										$this->di->get('db')->query("INSERT INTO addresses ".$insField." VALUES ".$insStr);
-										$insStr='';
-									}							
-
-								$row++;
-							}
-							
-							if($data==false && $insStr!=''){
-
-									$insStr=substr($insStr,0,-1);
-									
-									$this->di->get('db')->query("INSERT INTO addresses ".$insField." VALUES ".$insStr);
-
-							}
-
-							fclose($handle);
-							unlink($tmpFile);
-							
-						}
+						
 						$this->response->redirect($this->view->language.'/addressfolders/update/'.$addressfolder->uid.'/'); 
 					$this->view->disable(); 
 
@@ -277,6 +228,130 @@ class AddressfoldersController extends ControllerBase
 			$this->view->setVar('uploadfields',array());
 		}
 	}
+        
+        private function bulkInsertAddresses($addressfolder){
+            $time=time();
+            $row=0;
+            $insStr='';
+            
+            //Using Address Segment n:1 relation; lookup is there, but no mass insert possible 
+            $insField='(pid,tstamp,crdate,cruser_id,usergroup';
+            $indexArray=array();
+            foreach($this->request->getPost('adressFieldsMap') as $addressFieldIndex=> $addressField){
+                    if(intval($addressField) !=0 && !is_nan(intval($addressField))){
+                            $insField.=','.$this->addressesDBFielMap[intval($addressField)];
+                            array_push($indexArray,$addressFieldIndex);
+                    }
+            }
+            $insField.=')';
+            $basicInsVals=$addressfolder->uid.','.$time.','.$time.','.$this->session->get('auth')['uid'].','.$this->session->get('auth')['usergroup'];
+            $tmpFile='../app/cache/tmp/'.$this->request->getPost('time').'_'.$this->request->getPost('filename');
+            if (($handle = fopen($tmpFile, "r")) !== FALSE) {
+                    /*pretty nasty code redundancy*/
+                    if($this->request->getPost('firstRowFieldNames')==1){
+                            $data=$this->getCsvWrapper($handle, 1000, $this->_divider[$this->request->getPost('divider')],$this->_dataWrap[$this->request->getPost('dataFieldWrap')]);
+                    }
+
+                    while(($data = $this->getCsvWrapper($handle, 1000, $this->_divider[$this->request->getPost('divider')],$this->_dataWrap[$this->request->getPost('dataFieldWrap')])) !== FALSE){
+                            if(count($data)>0){
+                                    $insStr.='('.$basicInsVals;
+                                    foreach($data as $valueindex=> $value){
+                                            if(in_array($valueindex, $indexArray)){
+                                                    if(is_numeric($value)){
+                                                            $insStr.=','.$value;
+                                                    }else{
+                                                            $insStr.=',"'.$value.'"';
+                                                    }
+
+                                            }
+                                    }
+
+                                    $insStr.='),';									
+                                    if($row>0 && $row%500==0){
+                                            $insStr=substr($insStr,0,-1);
+                                            $this->di->get('db')->query("INSERT INTO addresses ".$insField." VALUES ".$insStr);
+                                            $insStr='';
+                                    }							
+
+                            $row++;
+                            }
+                    }
+
+                    if($data==false && $insStr!=''){
+                                    $insStr=substr($insStr,0,-1);
+                                    $this->di->get('db')->query("INSERT INTO addresses ".$insField." VALUES ".$insStr);
+                    }
+                    fclose($handle);
+                    unlink($tmpFile);
+            }
+        }
+        
+        private function updateAddresses($addressfolder){
+            $time=time();
+             $insField=array('pid','tstamp','crdate','cruser_id','usergroup');
+                 
+            $indexArray=array();
+            $emailIndex=0;
+            foreach($this->request->getPost('adressFieldsMap') as $addressFieldIndex=> $addressField){
+                    if(intval($addressField) !=0 && !is_nan(intval($addressField))){                            
+                            if($this->addressesDBFielMap[intval($addressField)]=='email'){
+                                $emailIndex=$addressFieldIndex;
+                            }
+                            array_push($insField,$this->addressesDBFielMap[intval($addressField)]);
+                            array_push($indexArray,$addressFieldIndex);
+                    }
+            }
+            $basicInsVals=array($addressfolder->uid,$time,$time,$this->session->get('auth')['uid'],$this->session->get('auth')['usergroup']);
+            
+            $tmpFile='../app/cache/tmp/'.$this->request->getPost('time').'_'.$this->request->getPost('filename');
+            if (($handle = fopen($tmpFile, "r")) !== FALSE) {
+                    /*pretty nasty code redundancy*/
+                    if($this->request->getPost('firstRowFieldNames')==1){
+                            $data=$this->getCsvWrapper($handle, 1000, $this->_divider[$this->request->getPost('divider')],$this->_dataWrap[$this->request->getPost('dataFieldWrap')]);
+                    }
+
+                    while(($data = $this->getCsvWrapper($handle, 1000, $this->_divider[$this->request->getPost('divider')],$this->_dataWrap[$this->request->getPost('dataFieldWrap')])) !== FALSE){
+                            if(count($data)>0){
+                                    $insArr=array();
+                                    foreach($basicInsVals as $baseVal){
+                                        array_push($insArr,$baseVal);
+                                    }
+                                    foreach($data as $valueindex=> $value){
+                                            if(in_array($valueindex, $indexArray)){                                                    
+                                                array_push($insArr,$value);                                                                                                                
+                                            }
+                                    }
+                                    
+                                    $newVals=array_combine($insField,$insArr);
+                                    
+                                    $oldRecord=Addresses::findFirst(array(
+                                       'conditions' => 'pid = ?1 AND email LIKE ?2',
+                                        'bind' => array(
+                                            1 => $addressfolder->uid,
+                                            2 => $data[$emailIndex]
+                                            
+                                        )
+                                    ));
+                                    
+                                    if($oldRecord){
+                                        $oldRecord->assign(
+                                            $newVals
+                                         );
+                                        $oldRecord->update();
+                                    }else{
+                                        $record=new Addresses();
+                                        $record->assign($newVals);
+                                        $record->save();
+                                    }
+                            }
+                    }
+
+                    
+                    fclose($handle);
+                    unlink($tmpFile);
+            }
+        }
+        
 	
         private function eraseFoldAdd($folderUid){
             Addresses::findByPid($folderUid)->delete();
@@ -284,12 +359,44 @@ class AddressfoldersController extends ControllerBase
         
 	private function getCsvWrapper($handle, $length, $divider,$wrap){
 		if($wrap){
-			return fgetcsv($handle, $length, $divider,$wrap);
+                    $row = fgetcsv($handle, $length, $divider,$wrap);
+                     $finalRow=array();
+                    if($row){
+                    $finalRow = array_map( 
+                            function($output){
+                                                if(!mb_check_encoding($output, 'UTF-8') OR !($output === mb_convert_encoding(mb_convert_encoding($output, 'UTF-32', 'UTF-8' ), 'UTF-8', 'UTF-32'))) {
+
+                                    $output = mb_convert_encoding($output, 'UTF-8', 'pass'); 
+                                }
+                                return $output;
+                            }
+                            , $row );
+                    }
+                    else{
+                        $finalRow=$row;
+                    }
+                    return $finalRow;
 		}else{
-			return fgetcsv($handle, $length, $divider);
+                    $row = fgetcsv($handle, $length, $divider);
+                    $finalRow=array();
+                    if($row){
+                    $finalRow = array_map( 
+                            function($output){
+                                                if(!mb_check_encoding($output, 'UTF-8') OR !($output === mb_convert_encoding(mb_convert_encoding($output, 'UTF-32', 'UTF-8' ), 'UTF-8', 'UTF-32'))) {
+
+                                    $output = mb_convert_encoding($output, 'UTF-8', 'pass'); 
+                                }
+                                return $output;
+                            }
+                            , $row );
+                    
+                    }else{
+                        $finalRow=$row;
+                    }
+                    return $finalRow;        
 		}
 	}
-	
+        
 	
 	public function updateAction()
 	{
