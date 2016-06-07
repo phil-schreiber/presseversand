@@ -24,15 +24,23 @@ class MailobjectsController extends ControllerBase
 			$mailobjects=Mailobjects::find(array(
 				"conditions" => "deleted=0 AND hidden=0 AND usergroup = ?1",
 				"bind" => array(1 => $this->session->get('auth')['usergroup']),
-				"order" => "tstamp DESC"
+				"order" => "cruser_id <> ".$this->session->get('auth')['uid'].",cruser_id,tstamp DESC"
 			));
 			$mailobjectsArray=array();
+                        $userCounter=-1;
+                        $olduser=0;
 			foreach($mailobjects as $mailobject){
-				$mailobjctsArray[]=array(
+                            if( $olduser !== $mailobject->cruser_id){
+                               $olduser= $mailobject->cruser_id;
+                               $userCounter++;
+                            }
+				$mailobjctsArray[$userCounter][]=array(
 					'uid'=>$mailobject->uid,
 					'title'=>$mailobject->title,
-					'date' =>date('d.m.Y',$mailobject->tstamp)
+					'date' =>date('d.m.Y H:i',$mailobject->tstamp),
+                                        'cruser' => $mailobject->getCruser()->username,
 				);
+                                
 						
 			}
 			$returnJson=json_encode($mailobjctsArray);
@@ -167,13 +175,34 @@ class MailobjectsController extends ControllerBase
 		//$this->view->setVar('language',);
 		if($this->request->isPost() && $this->dispatcher->getParam("uid")){
 			
-			$mailObjectUid = $this->dispatcher->getParam("uid");
-			$mailobjectRecord = Mailobjects::findFirst(array(
-			"conditions" => "uid = ?1",
-			"bind" => array(1 => $mailObjectUid)
-			));
 			
-			$contentElements=$_POST['contentElements'];
+			$time=time();
+                        if($this->request->getPost('newTitle') !== ''){
+                            $oldMailObjectUid = $this->dispatcher->getParam("uid");
+                            $oldMailobjectRecord = Mailobjects::findFirst(array(
+                                "conditions" => "uid = ?1",
+                                "bind" => array(1 => $oldMailObjectUid)
+                             ));
+                            $mailobjectRecord=new Mailobjects();
+                            $mailobjectRecord->assign(array(				
+                                    'tstamp' => $time,				
+                                    'crdate' => $time,
+                                    'cruser_id' => $this->session->get('auth')['uid'],
+                                    'usergroup' => $this->session->get('auth')['usergroup'],
+                                    'title' => $this->request->getPost('newTitle'),
+                                    'templateuid' =>$oldMailobjectRecord->templateuid
+                            ));
+                            if ($mailobjectRecord->save()) {
+                                $mailObjectUid = $mailobjectRecord->uid;
+                            }                                                        
+                        }else{
+                            $mailObjectUid = $this->dispatcher->getParam("uid");
+                            $mailobjectRecord = Mailobjects::findFirst(array(
+                                "conditions" => "uid = ?1",
+                                "bind" => array(1 => $mailObjectUid)
+                             ));
+                        }
+			$contentElements=$this->request->hasPost('contentElements') ? $this->request->getPost('contentElements') : 0;
 			
 			$generatedMailformFile='../public/mails/mailobject_'.$mailObjectUid.'.html';
 			$templateFile=  '../app/modules/frontend/templates/template_mail_'.$mailobjectRecord->templateuid.'.volt';
@@ -261,13 +290,18 @@ class MailobjectsController extends ControllerBase
 			file_put_contents($generatedMailformFile, $mail);
 			$this->view->setVar('compiledTemplatebodyRaw',$bodyRaw);
 			$this->view->setVar('mailobjectuid',$mailObjectUid);
+                        $this->view->setVar('mailobjecttitle',$mailobjectRecord->title);
 			$environment= $this->config['application']['debug'] ? 'development' : 'production';
 			$baseUri=$this->config['application'][$environment]['staticBaseUri'];
 			$path=$baseUri.$this->view->language;
 			$this->view->setVar('source',$baseUri.'mails/mailobject_'.$mailObjectUid.'.html');
+                        
+                        if($mailObjectUid != $this->dispatcher->getParam("uid")){
+                           echo($path.'/mailobjects/update/'.$mailObjectUid.'/'); 
+                        }
 			$this->view->disable();
-			
-		}elseif($this->request->isPost() && !$this->dispatcher->getParam("uid") && $this->request->hasPost('dycont')==1){
+                        
+		}elseif($this->request->isPost() && !$this->dispatcher->getParam("uid") && $this->request->hasPost('dycont')){
 			$this->dycontAction();
 		}else{			
 			$mailObjectUid = $this->dispatcher->getParam("uid");
@@ -327,6 +361,7 @@ class MailobjectsController extends ControllerBase
 			$environment= $this->config['application']['debug'] ? 'development' : 'production';
 			$baseUri=$this->config['application'][$environment]['staticBaseUri'];
 			$path=$baseUri.$this->view->language;
+                        $this->view->setVar('mailobjecttitle',$mailobjectRecord->title);
 			$this->view->setVar('source',$baseUri.'mails/mailobject_'.$mailObjectUid.'.html');
 			$this->view->setVar('path',$path.'/mailobjects/update/');			
 		}
@@ -351,7 +386,20 @@ class MailobjectsController extends ControllerBase
 	}
 	
 	private function dycontAction(){
-		$chlead = curl_init();
+            switch($this->request->getPost('dycont')){
+                case 1:
+                    $this->dyTecparts();
+                    break;
+                case 2:
+                    $this->dyTrackingtool();
+                    break;
+            }
+            
+		
+	}
+                       
+        private function dyTecparts(){
+            $chlead = curl_init();
 		curl_setopt($chlead, CURLOPT_URL, 'https://www.tecparts.com/api/rest/article/getArticle?code='.$this->request->getPost('code'));
 		curl_setopt($chlead, CURLOPT_PUT, true);		
 		curl_setopt($chlead, CURLOPT_RETURNTRANSFER, true);		
@@ -361,8 +409,22 @@ class MailobjectsController extends ControllerBase
 		echo('{"article":'.$chleadresult.',"code":"'.$this->request->getPost('code').'"}');
 		$this->view->disable(); 
 		die();
-	}
+        }
 	
+         private function dyTrackingtool(){
+            /* TODO ans Trackingtool anpassen */
+            $chlead = curl_init();
+		curl_setopt($chlead, CURLOPT_URL, 'https://www.tecparts.com/api/rest/article/getArticle?code='.$this->request->getPost('code'));
+		curl_setopt($chlead, CURLOPT_PUT, true);		
+		curl_setopt($chlead, CURLOPT_RETURNTRANSFER, true);		
+		curl_setopt($chlead, CURLOPT_SSL_VERIFYPEER, 0);
+		$chleadresult = curl_exec($chlead);		
+		curl_close($chlead);
+		echo('{"article":'.$chleadresult.',"code":"'.$this->request->getPost('code').'"}');
+		$this->view->disable(); 
+		die();
+        }
+        
 	function writeContentElements($bodyRaw,$contentObjects){
 		$contentPerPosition=array();
 		foreach($contentObjects as $contentObject){

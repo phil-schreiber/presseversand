@@ -15,6 +15,9 @@ class Distributors extends Model{
        $this->hasManyToMany("uid", "nltool\Models\Distributors_segmentobjects_lookup", "uid_local", "uid_foreign", "nltool\Models\Segmentobjects", "uid",array('alias' => 'segments'));
 	   $this->hasManyToMany("uid", "nltool\Models\Distributors_addressfolders_lookup", "uid_local", "uid_foreign", "nltool\Models\Addressfolders", "uid",array('alias' => 'addressfolders'));
 	   $this->hasMany("uid", "nltool\Models\Addresses", "",array('alias' => 'addresses'));
+           $this->hasOne('cruser_id', 'nltool\Models\Feusers', 'uid', array(
+                    'alias' => 'cruser'
+                ));
     }
 	
 	public function hasMany($fields, $referenceModel, $referencedFields, $options = NULL){

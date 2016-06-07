@@ -137,6 +137,8 @@ $messages = array(
 	"zip" => "PLZ",
 	"region" => "Region",
 	"place" => "Ort",
+        "city" => "Ort",
+        "province" => "Bundesland",
 	"state" => "Bundesland",	
 	"address"=> "Adresse",
 	"phone" => "Telefon",
@@ -243,6 +245,8 @@ $messages = array(
 	"none" => "ohne",
 	"newReviewNotify" => "<body style=\"font-family:sans-serif;\">Sehr geehrte(r) Herr/Frau #name#, <br> soeben wurde das neue Mailing mit Betreff '#subject#' (Versanddatum: #senddate#) erstellt und wartet auf Ihre Freigabe:<br> #reviewLink#</body>",
 	"newReviewNotifySubject" => "Newsletter Tool - Eine neue Freigabe wartet auf Sie",
+        "optinMail" => "<body style=\"font-family:sans-serif;\"><p style=\"margin-bottom:10px\">#anrede# #name#, </p><p style=\"margin-bottom:10px\"> bitte klicken Sie folgenden Link, um Ihre Anmeldung für den Newsletter zu bestätigen:</p><p style=\"margin-bottom:10px\"> #reviewLink#</p><p style=\"margin-bottom:10px\">#greetings#</p></body>",
+	"optinMailSubject" => "Bitte bestätigen Sie Ihre Mailadresse",
 	"download" => "Download",
 	"reportLinkListDownload" => "Details runterladen",
         "downloadUnsubscribes" => "Abmeldungen runterladen",
@@ -253,6 +257,10 @@ $messages = array(
 	"salutation.male" => "Sehr geehrter Herr",
 	"salutation.female" => "Sehr geehrte Frau",
 	"thankyouSubscription" => "Vielen Dank für Ihre Anmeldung zum Newsletter",
+        "thankyouOption" => "Bitte bestätigen Sie Ihre
+Newsletteranmeldung, indem Sie den Link klicken, den wir Ihnen soeben
+zugesandt haben. <br>
+Vielen Dank.",
 	"date" => "einmaliger terminierter Versand",
 	"recursive" => "wiederkehrender Versand",
 	"birthday" => "Geburtstag der Addressaten",
@@ -284,7 +292,13 @@ $messages = array(
 	"templateTypeContentDynamic" => "dynamisches Inhaltselement Tecparts Shop (hybris Api basiert)",
 	"articelnumber" => "Anzahl der Artikel",
 	"articleURLs" => "Artikel URLs",
-        "mailLink" => "Direktlink zur Mail"
-	
+        "mailLink" => "Direktlink zur Mail",
+        "subscriptionAddressFields" => "einzubindende Adressfelder",
+        "subscribeOk" => "Newsletter abonnieren",
+        "mandatory" => "Mit * gekennzeichnete Felder müssen ausgefüllt werden.",        
+	"dataprotection" => "Datenschutz",
+        "fieldIsMandatory" => "Bitte füllen Sie das Feld aus",
+        "agree" => "Bitte stimmen Sie zu, um fortzufahren",
+        "newTitleMail" =>"Um Kopie der Mail anzulegen hier neuen Titel eingeben."
 );
 ?>

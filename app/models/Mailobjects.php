@@ -87,6 +87,9 @@ class Mailobjects extends Model{
 	 public function initialize()
     {
         $this->hasMany("uid", "nltool\Models\Contentobjects", "mailobjectuid",array('alias' => 'contentobjects'));
+        $this->hasOne('cruser_id', 'nltool\Models\Feusers', 'uid', array(
+                    'alias' => 'cruser'
+                ));
     }
 	
 }

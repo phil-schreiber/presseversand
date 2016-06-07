@@ -30,7 +30,8 @@
 <div class="clearfix"></div>
 <div id="desktop">
 	<div id="left">
-	<h1>{{ tr('activeModeTitle') }}</h1>
+            <h1>{{ tr('activeModeTitle') }} - {{ mailobjecttitle }}</h1>
+        
 	<div id="editFrameWrapper">
 		
 		<div id="activityModeBar" class="desktopHeader" style="height:auto;min-height:50px;">
@@ -50,6 +51,7 @@
 		<div id="editFrame">
 			
 			<form id="editFrameForm">
+                            <span style="font-size:0.8em;"><input style="width:100%;" type="text" placeholder="{{tr('newTitleMail')}}" id="newTitle" name="newTitle"></span>
 			{{ compiledTemplatebodyRaw }} 
 			<input type="hidden" value="{{ mailobjectuid }}" name="mailobjectUid" id="mailobjectUid">
 			</form>
@@ -94,7 +96,8 @@
 					{{ image(templatedDyElement.templatefilepath) }}
 					
 					{{ templatedDyElement.sourcecode }}
-					
+                                        <input type="hidden" name="api" value="{{templatedDyElement.api}}">
+                                        <input type="hidden" name="dytype" value="{{templatedDyElement.dytype}}">
 				</div>
 			</div>
 			{% endif %}

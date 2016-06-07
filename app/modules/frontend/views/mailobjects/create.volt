@@ -17,7 +17,7 @@
 		<div class="listelementContainer">
 		<h3>{{ templateobject.title }}</h3><br>
 			<div class="thumb">
-				<img src="{{ templateobjectsthumbs[templateobject.uid] }}" width="300">
+				<img src="{{ templateobjectsthumbs[templateobject.uid] }}">
 			</div>
 		</div>
 			</li>

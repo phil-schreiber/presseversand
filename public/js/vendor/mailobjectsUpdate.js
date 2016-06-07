@@ -1,5 +1,11 @@
-var reloadFrame=function(){
-		location.reload();
+var reloadFrame=function(data){
+    console.log(data);
+        if(!data){
+        
+	location.reload();
+        }else{
+           window.location =data;
+        }
 	//document.getElementById('mailobjectFrame').src += '';	
 };
 var showPreview=function(){
@@ -7,6 +13,7 @@ var showPreview=function(){
 	jQuery('#viewFrame').show();
 }
 var reloadFrameDelete=function(data){
+    console.log(data)
 	if(data=='1'){
 		location.reload();
 	}else{
@@ -91,8 +98,8 @@ var pollForTinymce=function(){
 				"searchreplace visualblocks code fullscreen textcolor",
 				"insertdatetime media table contextmenu paste jbimages fileupload"
 			],
-                        
-			extended_valid_elements : "dynamic,p[style],td[style]",
+                        table_toolbar: "tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol",
+			extended_valid_elements : "dynamic",
 			custom_elements: "~dynamic",			
 			toolbar: "customem | insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link | forecolor backcolor |code",
                          textcolor_map: [
@@ -108,7 +115,16 @@ var pollForTinymce=function(){
     "f5821f", "Planterra Orange",
     "ffd430", "Planterra Yellow",
     "4bb85f", "Planterra light Green",
-    "b2815a", "Planterra light Red"
+    "b2815a", "Planterra light Red",
+    "4a5d5b", "Bonimal Allgemein Grau",
+    "5ba345", "Bonimal Rind Grün",
+    "dc6e85", "Bonimal Schwein Pink",
+    "e9d554", "Bonimal Geflügel Gelb",
+    "b06e3e", "Bonimal Schaf Orange",
+    "d95957", "Bonimal Tiergesundheit Rot",
+    "48c7f4", "Bonimal Tierhygiene Blau",
+    "b2b3b6", "Bonimal Service Hellgrau",
+    "ffffff","White"
   ],
 			style_formats_merge: true/*,
 			style_formats: [
@@ -225,9 +241,10 @@ function pluginInit(){
 				revert: "invalid",
 				containment: "#desktop",
 				start: function(event,ui) {
-
-					jQuery(ui.helper).addClass("clone");
-
+                                    
+                                    jQuery(ui.helper).addClass("clone");
+					var cElement=jQuery(ui.helper).find('.cElement');
+					jQuery(cElement).addClass('hidden');
 				 }
 			});
 		});
@@ -324,9 +341,8 @@ function pluginInit(){
       hoverClass: "ui-state-hover",
 	  
       drop: function( event, ui ) {		  
-		  
-		  var elOffsetTop=event.pageY - $(this).offset().top;
-		  
+		                    
+		  var elOffsetTop= ui.offset.top;		 
 		  var cElementsOnPosition=jQuery(this).find('.cElement');
 		  var newElement;
 		  
@@ -376,8 +392,8 @@ function pluginInit(){
 				var inserted=false;
 				
 				for(var i=0; i<cElementsOnPosition.length; i++){				  
-				
-					if(elOffsetTop <= cElementsOnPosition[i].offsetTop){					 					  											  
+				console.log(jQuery(cElementsOnPosition[i]).offset().top);
+					if(elOffsetTop <= jQuery(cElementsOnPosition[i]).offset().top){					 					  											  
 					  jQuery(newElement).insertBefore(jQuery(cElementsOnPosition[i]));
 					  inserted=true;
 					  break;
@@ -421,7 +437,7 @@ function pluginInit(){
 		
 			var editElements='';
 			jQuery('#editFrame .editable a, #editFrame .editable div, #editFrame .editable td, #editFrame .editable table, #editFrame .editable img, #editFrame .editable p').removeAttr('data-mce-style  data-mce-href  data-mce-src data-mce-selected');
-			//jQuery('#editFrame .editable p').removeAttr('style');
+			jQuery('#editFrame .editable p').removeAttr('style');
 			jQuery('#editFrame .editable').each(function(posIndex,posEl){
 				jQuery(posEl).children('.cElement').each(function(index,element){
 					var content=jQuery(element)[0].outerHTML;

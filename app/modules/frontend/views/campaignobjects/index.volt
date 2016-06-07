@@ -3,16 +3,28 @@
 {{ content() }}
 <div class="container">	
 {%- if session.get('auth') -%}
-<div class='ceElement medium'>
+<div class='ceElement'>
 <h1>{{tr('campaigns')}}</h1>
 
 
 
-<ul class="listviewList">
-	{% for campaignobject in campaignobjects %}
-	<li><a href='{{ path }}{{ campaignobject.uid }}'>>> {{campaignobject.title}} | {{ date('d.m.Y',campaignobject.tstamp) }}</a><span class="glyphicon glyphicon-remove deleteListItem" title="{{tr('delete')}}"><input type="hidden" value="{{campaignobject.uid}}"></span></li>
-	{% endfor %}
-</ul>
+
+<table class="display dataTable standardDataTable">
+    <thead><th>Datum</th><th>Titel</th><th>angelegt von</th><th>Löschen</th></thead>
+<tbody>
+    {% for index,campaignobject in campaignobjects %}
+    <tr {% if index%2==0 %}class="even"{% else %}class="odd"{% endif %}>
+        <td>{{date('d.m.Y H:i',campaignobject.tstamp)}}</td>
+        <td><a href='{{ path }}{{ campaignobject.uid }}'>>> {{campaignobject.title}}</a></td>
+        <td>{{campaignobject.getCruser().email}}</td>
+        <td>
+            <span class="glyphicon glyphicon-remove deleteListItem" title="{{tr('delete')}}"><input type="hidden" value="{{campaignobject.uid}}"></span>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>    
+</table>
+
 </div>
 {%- endif -%}
 

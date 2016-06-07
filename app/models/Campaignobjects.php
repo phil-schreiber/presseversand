@@ -19,6 +19,9 @@ class Campaignobjects extends Model{
 	}
 	public function initialize(){
 		$this->hasMany("uid", "nltool\Models\Sendoutobjects", "campaignuid",array('alias' => 'sendoutobjects'));
+                $this->hasOne('cruser_id', 'nltool\Models\Feusers', 'uid', array(
+                    'alias' => 'cruser'
+                ));
 	}
 	
 }

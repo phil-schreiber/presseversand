@@ -494,16 +494,25 @@ function getPath(sendoutObject){
 
 var selectMailobject=function (data){
 	var jsObject = JSON.parse( data );
-	var selectString='<select id="mailobjectSelectElements">';
+	var selectString='<select id="mailobjectSelectElements" class="chosen-select">';
+        
 	for(var i=0;i<jsObject.length;i++){
-		selectString+='<option value="'+jsObject[i].uid+'">'+jsObject[i].title+' | '+jsObject[i].date+'</option>';
+                selectString+='<optgroup label="'+jsObject[i][0].cruser+'">'
+                for(var j=0;j<jsObject[i].length;j++){
+		selectString+='<option value="'+jsObject[i][j].uid+'">'+jsObject[i][j].title+' | '+jsObject[i][j].date+'</option>';
+                }
+                selectString+='</optgroup>';
 	}
 	selectString+='</select>';
 	jQuery('#mailobjectSelectWrapper').html(selectString);
 	
 	var selectStringB='<select id="mailobjectSelectElementsB">';
 	for(var i=0;i<jsObject.length;i++){
-		selectStringB+='<option value="'+jsObject[i].uid+'">'+jsObject[i].title+' | '+jsObject[i].date+'</option>';
+                selectStringB+='<optgroup label="'+jsObject[i][0].cruser+'">'
+                for(var j=0;j<jsObject[i].length;j++){
+		selectStringB+='<option value="'+jsObject[i][j].uid+'">'+jsObject[i][j].title+' | '+jsObject[i][j].date+'</option>';
+                }
+                selectStringB+='</optgroup>';
 	}
 	selectStringB+='</select>';
 	jQuery('#mailobjectSelectWrapperB').html(selectStringB);
@@ -514,13 +523,17 @@ var selectMailobject=function (data){
 
 var selectAdressfolder=function(data){
 	var jsObject = JSON.parse( data );
-		var selectString='<select id="addressfoldersSelectElements">';
-		for(var i=0;i<jsObject.length;i++){
-			selectString+='<option value="'+jsObject[i].uid+'">'+jsObject[i].title+' | '+jsObject[i].addresscount+'</option>';
-	}
+		var selectString='<select id="addressfoldersSelectElements" class="chosen-select">';
+                for(var i=0;i<jsObject.length;i++){
+                    selectString+='<optgroup label="'+jsObject[i][0].cruser+'">'
+                            for(var j=0;j<jsObject[i].length;j++){
+                                    selectString+='<option value="'+jsObject[i][j].uid+'">'+jsObject[i][j].title+' | '+jsObject[i][j].addresscount+'</option>';
+                    }
+                    selectString+='</optgroup>';
+                }
 		selectString+='</select>';
 	jQuery('#adressfolderSelectWrapper').html(selectString);
-
+        
 	ajaxIt('configurationobjects','','',selectConfigurationobject);
 };
 
@@ -529,6 +542,7 @@ jQuery('#mailobjectSelect button.ok').click(function(e){
 	var elementDefinition=jQuery(activeElement).parent().find('input');		
 
 	jQuery(elementDefinition[0]).val(jQuery('#mailobjectSelectElements').val());
+        
 	jQuery(elementDefinition[1]).val(jQuery('#configurationobjectSelect').val());
 	jQuery(elementDefinition[2]).val(jQuery('#datepicker').val());
 	jQuery(elementDefinition[3]).val(encodeURIComponent(jQuery('#subject').val()));
@@ -568,15 +582,25 @@ jQuery('#conditionsModelerSelect button.abort').click(function(e){
 
 var selectConfigurationobject= function(data){
 	var jsObject= JSON.parse(data);
-	var selectString='<select id="configurationobjectSelect">';
+	var selectString='<select id="configurationobjectSelect" class="chosen-select">';
+        for(var i=0;i<jsObject.length;i++){
+            console.log(jsObject[i]);
+                    selectString+='<optgroup label="'+jsObject[i][0].cruser+'">'
+                for(var j=0;j<jsObject[i].length;j++){
+                        selectString+='<option value="'+jsObject[i][j].uid+'">'+jsObject[i][j].title+' | '+jsObject[i][j].date+'</option>';
+                }
+                selectString+='</optgroup>';
+            }
+            selectString+='</select>';
+	var selectStringB='<select id="configurationobjectSelectB" class="chosen-select">';
 	for(var i=0;i<jsObject.length;i++){
-		selectString+='<option value="'+jsObject[i].uid+'">'+jsObject[i].title+' | '+jsObject[i].date+'</option>';
-	}
-	var selectStringB='<select id="configurationobjectSelectB">';
-	for(var i=0;i<jsObject.length;i++){
-		selectStringB+='<option value="'+jsObject[i].uid+'">'+jsObject[i].title+' | '+jsObject[i].date+'</option>';
-	}
-	selectString+='</select>';
+                    selectStringB+='<optgroup label="'+jsObject[i][0].cruser+'">'
+                for(var j=0;j<jsObject[i].length;j++){
+                        selectStringB+='<option value="'+jsObject[i][j].uid+'">'+jsObject[i][j].title+' | '+jsObject[i][j].date+'</option>';
+                }
+                selectStringB+='</optgroup>';
+            }
+	selectStringB+='</select>';
 	jQuery('#configurationobjectSelectWrapper').html(selectString);
 	jQuery('#configurationobjectSelectWrapperB').html(selectStringB);	
 	jQuery('#mailobjectSelect').removeClass('hidden');
@@ -607,6 +631,8 @@ var selectConfigurationobject= function(data){
 		
 		
 	}
+        
+        
 };
 
 /*jQuery('#configurationobjectSelect button.ok').click(function(e){

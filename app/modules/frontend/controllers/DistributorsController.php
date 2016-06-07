@@ -20,29 +20,25 @@ class DistributorsController extends ControllerBase
 			$distributors = Distributors::find(array(
 				"conditions" => "deleted=0 AND hidden=0 AND usergroup = ?1",
 				"bind" => array(1 => $this->session->get('auth')['usergroup']),
-				"order" => "tstamp DESC"
+				"order" => "cruser_id <> ".$this->session->get('auth')['uid'].",cruser_id,tstamp DESC"
 			));
 			$distributorsArray = array();
+                         $userCounter=-1;
+                        $olduser=0;
 			foreach($distributors as $distributor){
+                             if( $olduser !== $distributor->cruser_id){
+                               $olduser= $distributor->cruser_id;
+                               $userCounter++;
+                            }
 				$distributorAddresses=$distributor->countAddresses();
-				/*$folders=$distributor->getAddressfolders();
-				if($folders){
-					foreach($folders as $folder){
-						$distributorAddresses+=$folder->countAddresses();
-					}
-				}
-				$segments=$distributor->getSegments();
-				if($segments){
-					foreach($segments as $segment){
-						$distributorAddresses+=$segment->countAddresses();
-					}
-				}*/
 				
-				$distributorsArray[]=array(
+				
+				$distributorsArray[$userCounter][]=array(
 					'uid'=>$distributor->uid,
 					'title'=>$distributor->title,
-					'date' =>date('d.m.Y',$distributor->tstamp),
-					'addresscount'=>$distributorAddresses
+					'date' =>date('d.m.Y H:i',$distributor->tstamp),
+					'addresscount'=>$distributorAddresses,
+                                        'cruser' => $distributor->getCruser()->username,
 				);
 						
 			}

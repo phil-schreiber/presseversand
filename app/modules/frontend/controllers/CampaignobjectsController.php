@@ -130,6 +130,7 @@ class CampaignobjectsController extends ControllerBase
 			$path=$baseUri.'public/mails/';
 			$this->assets->addJs('js/vendor/campaignInit.js');
 			$this->assets->addCss('css/jquery.datetimepicker.css');
+                        
 			$this->view->setVar('lang',$this->view->language);
 			$this->view->setVar('mailpath',$path);
 		 }
@@ -167,6 +168,7 @@ class CampaignobjectsController extends ControllerBase
 
 			$this->assets->addJs('js/vendor/campaignInit.js');
 			$this->assets->addCss('css/jquery.datetimepicker.css');
+                        $this->assets->addCss('css/chosen.min.css');
 			$this->view->setVar('lang',$this->view->language);
 			$environment= $this->config['application']['debug'] ? 'development' : 'production';
 			$baseUri=$this->config['application'][$environment]['staticBaseUri'];
@@ -334,7 +336,8 @@ class CampaignobjectsController extends ControllerBase
 								'subject'=>urldecode($rawArray['subjectB']),
 								'abtest'=>1,
 								'distributoruid'=>$sendoutobject->distributoruid,
-								'domid'=>$rawArray['id']
+								'domid'=>$rawArray['id'],
+                                                            'eventuid' => 0
 
 							));
 							if(!$sendoutobjectB->save()){

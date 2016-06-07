@@ -23,15 +23,22 @@ class ConfigurationobjectsController extends ControllerBase
 		$configurationobjects=Configurationobjects::find(array(
 				"conditions" => "deleted=0 AND hidden=0 AND usergroup = ?1",
 				"bind" => array(1 => $this->session->get('auth')['usergroup']),
-				"order" => "tstamp DESC"
+				"order" => "cruser_id <> ".$this->session->get('auth')['uid'].",cruser_id,tstamp DESC"
 			));
 		if($this->request->isPost()){
 			$confObjectsArr=array();
+                         $userCounter=-1;
+                        $olduser=0;
 			foreach($configurationobjects as $configurationobject){
-				$confObjectsArr[]=array(
+                              if( $olduser !== $configurationobject->cruser_id){
+                               $olduser= $configurationobject->cruser_id;
+                               $userCounter++;
+                            }
+				$confObjectsArr[$userCounter][]=array(
 					'uid'=>$configurationobject->uid,
 					'title' => $configurationobject->title,
-					'date'=> date('d.m.Y',$configurationobject->tstamp)
+					'date'=> date('d.m.Y',$configurationobject->tstamp),
+                                          'cruser' => $configurationobject->getCruser()->username,
 				);
 			}
 			$returnJson=json_encode($confObjectsArr);
@@ -82,7 +89,29 @@ class ConfigurationobjectsController extends ControllerBase
 
 			 if (!$configurationobject->save()) {
 				  $this->flash->error($configurationobject->getMessages());
-			 } 
+                        }else{
+                            $folderInStrng='';
+                            $folderBindArray=array();
+                            if($this->request->hasPost('authorities')){
+                                    foreach($this->request->getPost('authorities') as $key=>$value){
+                                            $folderInStrng.='?'.$key.',';
+                                            $folderBindArray[$key]=$value;
+                                    }
+                                    $authorities=  Feusers::find(array(
+                                            'conditions' => 'uid IN ('.substr($folderInStrng,0,-1).')',
+                                            'bind' => $folderBindArray
+
+                                    ));
+
+
+                                    foreach ($authorities as $authority){								
+                                            $authoritiesArr[]=$authority;				
+                                    }
+                                $configurationobject->authorities=$authoritiesArr;
+                                $configurationobject->update();
+                            }
+                           
+                        } 
 
 
 		}
